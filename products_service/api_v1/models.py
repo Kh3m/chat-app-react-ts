@@ -20,6 +20,11 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
+
 
 class Image(models.Model):
     """Represents an image associated with a product or variant."""
@@ -32,6 +37,11 @@ class Image(models.Model):
     def __str__(self):
         return f"Image URL for {self.content_object}: {self.url}"
 
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
+
     class Meta:
         indexes = [models.Index(fields=["content_type", "object_id"]),]
 
@@ -43,6 +53,10 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=2)
     user_id = models.CharField(max_length=30)
+    reviews = models.ManyToManyField(
+        "Review", related_name="products_reviews", null=True)
+    variants = models.ManyToManyField(
+        "Variant", related_name="products_variants", null=True)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, null=False)
     images = GenericRelation(Image)
@@ -55,12 +69,18 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
+
 
 class Review(models.Model):
-    """Represents a review for a product."""
+    """Represents a review for a product"""
     id = ULIDField(default=default, primary_key=True)
     user_id = models.CharField(max_length=30)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="product_reviews")
     body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -71,25 +91,42 @@ class Review(models.Model):
     def __str__(self):
         return self.body[:50]
 
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
+
 
 class Variant(models.Model):
-    """Represents a variant of a product."""
+    """Represents a variant for one or more products"""
     id = ULIDField(default=default, primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
+    products = models.ManyToManyField(
+        "Product", related_name="products_variants", null=True)
     description = models.TextField(null=True)
 
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
+
 
 class Option(models.Model):
-    """Represents an option or attribute of a product's variation."""
+    """Represents an option or attribute of a product's variation"""
     id = ULIDField(default=default, primary_key=True)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     value = models.CharField(max_length=30, unique=True)
-    price = price = models.DecimalField(max_digits=15, decimal_places=2)
+    price = models.DecimalField(max_digits=15, decimal_places=2)
     images = GenericRelation(Image)
 
     def __str__(self):
         return self.value
+
+    def __repr__(self):
+        obj = vars(self)
+        obj['id'] = str(self.id)
+        return str(obj)
