@@ -1,5 +1,10 @@
+import logging
+
 from rest_framework import serializers
 from .models import Order, OrderItem
+
+# Define a logger for this module
+logger = logging.getLogger(__name__)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -15,6 +20,9 @@ class OrderSerializer(serializers.ModelSerializer):
         total_price = sum([item.item_price for item in order_items]) + self.validated_data['delivery_charge']
         order.order_total_price = total_price
         order.save()
+
+        # add a logging statement
+        logger.info(f"Order {order.id} created successfully")
         return order
 
 
@@ -35,7 +43,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'variation_ids', 'product_id', 'product_price', 'quantity', 'is_item_ordered']
+        fields = ['id', 'order', 'variation_ids', 'product_id', 'item_price', 'quantity', 'is_item_ordered']
 
 
 class CreateOrderItemSerializer(serializers.ModelSerializer):
@@ -45,10 +53,16 @@ class CreateOrderItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         order_id = self.context['order_id']
+
         try:
             # check whether the order_id in the url params exists
             order = Order.objects.only('id').get(id=order_id)
-            return OrderItem.objects.create(order_id=order.id, **validated_data)
         except Order.DoesNotExist:
             # Handle the case where the order does not exist
+            logger.error(f"Order with id={order_id} does not exist")
             raise ValueError("Order with id={} does not exist".format(order_id))
+
+        logger.info(f"OrderItem created for Order {order.id}")
+        return OrderItem.objects.create(order_id=order.id, **validated_data)
+
+

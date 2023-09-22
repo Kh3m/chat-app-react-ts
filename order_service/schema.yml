@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: Fixam Order Service Project
+  version: 1.0.0
+  description: This project implements the Order Service logic of the Fixam Online
+    markeplace
+paths:
+  /v1/orders/:
+    get:
+      operationId: v1_orders_list
+      description: |-
+        Viewset for managing orders.
+
+        This viewset allows you to create, retrieve, update, and delete orders.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+    post:
+      operationId: v1_orders_create
+      description: |-
+        Viewset for managing orders.
+
+        This viewset allows you to create, retrieve, update, and delete orders.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+  /v1/orders/{order_id}/orderitems:
+    get:
+      operationId: v1_orders_orderitems_list
+      description: |-
+        API view for listing order items.
+
+        This view returns a list of items associated with a specific order.
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderItemList'
+          description: ''
+  /v1/orders/{order_id}/orderitems/{order_item_id}:
+    get:
+      operationId: v1_orders_orderitems_list_2
+      description: |-
+        API view for listing order items.
+
+        This view returns a list of items associated with a specific order.
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: order_item_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderItemList'
+          description: ''
+  /v1/orders/{order_id}/orderitems/create:
+    post:
+      operationId: v1_orders_orderitems_create_create
+      description: |-
+        API view for creating order items.
+
+        This view allows you to add new items to an existing order.
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateOrderItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateOrderItem'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderItem'
+          description: ''
+  /v1/orders/{id}:
+    put:
+      operationId: v1_orders_update
+      description: |-
+        API view for updating orders.
+
+        This view allows you to partially update order details: the order_status .
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderUpdate'
+          description: ''
+    patch:
+      operationId: v1_orders_partial_update
+      description: |-
+        API view for updating orders.
+
+        This view allows you to partially update order details: the order_status .
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderUpdate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderUpdate'
+          description: ''
+  /v1/orders/{id}/:
+    get:
+      operationId: v1_orders_retrieve
+      description: |-
+        Viewset for managing orders.
+
+        This viewset allows you to create, retrieve, update, and delete orders.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    delete:
+      operationId: v1_orders_destroy
+      description: |-
+        Viewset for managing orders.
+
+        This viewset allows you to create, retrieve, update, and delete orders.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /v1/orders/user/{user_id}:
+    get:
+      operationId: v1_orders_user_list
+      description: |-
+        API view for retrieving user order history.
+
+        This view returns a list of orders associated with a specific user.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+components:
+  schemas:
+    CreateOrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        variation_ids:
+          type: array
+          items:
+            type: string
+            maxLength: 36
+          nullable: true
+        product_id:
+          type: string
+          maxLength: 50
+        item_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_item_ordered:
+          type: boolean
+      required:
+      - id
+      - item_price
+      - product_id
+      - quantity
+    InlineOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_id:
+          type: string
+          maxLength: 50
+        order_status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+      required:
+      - id
+      - user_id
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_id:
+          type: string
+          maxLength: 50
+        delivery_address_id:
+          type: string
+          maxLength: 50
+        order_status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        delivery_charge:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        is_payment_successful:
+          type: boolean
+      required:
+      - delivery_address_id
+      - delivery_charge
+      - id
+      - user_id
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        order:
+          allOf:
+          - $ref: '#/components/schemas/InlineOrder'
+          readOnly: true
+        variation_ids:
+          type: array
+          items:
+            type: string
+            maxLength: 36
+          nullable: true
+        product_id:
+          type: string
+          maxLength: 50
+        item_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_item_ordered:
+          type: boolean
+      required:
+      - id
+      - item_price
+      - order
+      - product_id
+      - quantity
+    OrderStatusEnum:
+      enum:
+      - Pending
+      - Shipped
+      - Delivered
+      type: string
+      description: |-
+        * `Pending` - Pending
+        * `Shipped` - Shipped
+        * `Delivered` - Delivered
+    OrderUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        order_status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        cancel_order:
+          type: boolean
+      required:
+      - id
+    PaginatedOrderItemList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    PaginatedOrderList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    PatchedOrderUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        order_status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        cancel_order:
+          type: boolean
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
