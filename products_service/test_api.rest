@@ -1,0 +1,167 @@
+#Category =================================================
+### Get all categories
+GET http://localhost:8000/v1/categories
+
+### Get a category
+GET http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S
+
+### Create a new category
+POST http://localhost:8000/v1/categories/
+Content-Type: application/json
+
+{
+    "name": "Fashion",
+    "description": "Fashion"
+}
+
+### Create sub category
+POST http://localhost:8000/v1/categories/
+Content-Type: application/json
+
+{
+    "name": "Gadgets",
+    "description": "Gadgets",
+    "parent": "01HATY6RADG6X2FDXYWYDBT3J3"
+}
+
+### Update a category with PUT
+PUT http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
+Content-Type: application/json
+
+{   
+    "name": "Electronics",
+    "description": "Electronics items"
+}
+
+### Update a category with PATCH
+PATCH  http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
+Content-Type: application/json
+
+{   
+    "description": "Electronics items"
+}
+
+### Delete a category
+DELETE http://localhost:8000/v1/categories/01HAVH3Q2E38K6FE6XNEDNQZ12/
+
+
+
+#Products =================================================
+### Get all products
+GET http://localhost:8000/v1/products/01HATYSXKTTCHT4X51G63YK5NA/variants
+Connection: application/json
+
+### Create a new product
+POST http://localhost:8000/v1/products/
+Content-Type: application/json
+
+{
+    "name": "Laptop",
+    "description": "A powerful laptop",
+    "price": 10000.00,
+    "user_id": "user123",
+    "category": "01HATY6RADG6X2FDXYWYDBT3J3",
+}
+
+### Update a product with PUT
+PUT  http://localhost:8000/v1/products/01HATYSXKTTCHT4X51G63YK5NA/
+Content-Type: application/json
+
+{
+    "name": "Dell Laptop",
+    "description": "A powerful Dell laptop",
+    "price": "10000.00",
+    "user_id": "user123",
+    "category": "01HATY6RADG6X2FDXYWYDBT3J3",
+    "variants": ["01HAVJTZG7WC8Y155AEREE2PVT"]
+}
+
+### Update a product with PATCH
+PATCH  http://localhost:8000/v1/products/01HATYTEWP37SHW3S4KC6BNYJR/
+Content-Type: application/json
+
+{
+    "name": "Dell Laptop",
+    "description": "A powerful Dell laptop",
+    "price": "10000.00"
+}
+
+### Delete a product
+DELETE http://localhost:8000/v1/products/01HATYTEWP37SHW3S4KC6BNYJR/
+
+
+#Reviews =================================================
+### Get all reviews
+GET http://localhost:8000/v1/reviews/
+
+### Create new review
+POST http://localhost:8000/v1/reviews/
+Content-Type: application/json
+
+{
+    "user_id": "user1234",
+    "product": "01HATYSXKTTCHT4X51G63YK5NA",
+    "body": "I love the iPhone 15"
+}
+
+### Update review with PUT
+PUT http://localhost:8000/v1/reviews/01HAVHGJMADS8RM9P9VAH360BK/
+Content-Type: application/json
+
+{
+    "user_id": "user1234",
+    "product": "01HATYSXKTTCHT4X51G63YK5NA",
+    "body": "I really love the iPhone 15"
+}
+
+### Update review with PATCH
+PATCH http://localhost:8000/v1/reviews/01HAVHGJMADS8RM9P9VAH360BK/
+Content-Type: application/json
+
+{
+    "body": "I really love the iPhone 15"
+}
+
+
+# Variant ==================================================
+
+### Get all variants
+GET http://localhost:8000/v1/variants
+
+### Create a variant
+POST http://localhost:8000/v1/variants/
+Content-Type: application/json
+
+{
+    "name": "Color",
+    "description": "Item color"
+}
+
+### Update a variant with PUT
+PUT http://localhost:8000/v1/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
+Content-Type: application/json
+
+{
+    "name": "Color",
+    "description": "Color",
+    "products": ["01HATYSXKTTCHT4X51G63YK5NA"]
+}
+
+### Delete a variant
+DELETE http://localhost:8000/v1/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
+
+
+# Option ===========================================================
+### Get an Option
+Get http://localhost:8000/v1/options
+
+### Create an Option
+POST http://localhost:8000/v1/options/
+Content-Type: application/json
+
+{
+    "variant": "01HAVJTZG7WC8Y155AEREE2PVT",
+    "product": "01HATYSXKTTCHT4X51G63YK5NA",
+    "value": "Green",
+    "price": 2000
+}
