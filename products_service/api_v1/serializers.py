@@ -1,69 +1,67 @@
-import json
 from rest_framework import serializers
 from .models import *
-from api_v1.utils import serialize_ULID
-from django_ulid.models import ULIDField
-from ulid import ULID
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="product-detail", format="html")
+    id = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = Product
         fields = "__all__"
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation = serialize_ULID(representation)
-        return representation
 
-
-class CategorySerializer(serializers.ModelSerializer):
-    subcategories = serializers.SerializerMethodField()
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="category-detail", format="html")
+    id = serializers.UUIDField(read_only=True)
 
     class Meta:
         model = Category
         fields = "__all__"
 
+    subcategories = serializers.SerializerMethodField()
+
     def get_subcategories(self, instance):
-        subcategories = Category.objects.filter(parent=instance.id)
-        serializer = CategorySerializer(subcategories, many=True)
-        return len(serializer.data)
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation = serialize_ULID(representation)
-        return representation
+        subcategories_count = Category.objects.filter(
+            parent=instance.id).count()
+        return subcategories_count
 
 
-class ReviewSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="review-detail", format="html")
+    id = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = Review
         fields = "__all__"
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation = serialize_ULID(representation)
-        return representation
 
+class VariantSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="variant-detail", format="html")
+    id = serializers.UUIDField(read_only=True)
 
-class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
         fields = "__all__"
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation = serialize_ULID(representation)
-        return representation
 
+class ImageSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="image-detail", format="html")
 
-class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = "__all__"
+        fields = ['url', 'id', 'image_url', 'object_id']
 
 
-class OptionSerializer(serializers.ModelSerializer):
+class OptionSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="option-detail", format="html")
+
     images = serializers.SerializerMethodField()
 
     class Meta:
@@ -74,8 +72,3 @@ class OptionSerializer(serializers.ModelSerializer):
         images = instance.images.all()
         image_serializer = ImageSerializer(images, many=True)
         return image_serializer.data
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation = serialize_ULID(representation)
-        return representation
