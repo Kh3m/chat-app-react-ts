@@ -1,12 +1,12 @@
 #Category =================================================
 ### Get all categories
-GET http://localhost:8000/v1/categories
+GET http://localhost:8000/api/v1/product/categories
 
 ### Get a category
-GET http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S
+GET http://localhost:8000/api/v1/product/categories
 
 ### Create a new category
-POST http://localhost:8000/v1/categories/
+POST http://localhost:8000/api/v1/product/categories/
 Content-Type: application/json
 
 {
@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### Create sub category
-POST http://localhost:8000/v1/categories/
+POST http://localhost:8000/api/v1/product/categories/
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
 }
 
 ### Update a category with PUT
-PUT http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
+PUT http://localhost:8000/api/v1/product/products/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
 Content-Type: application/json
 
 {   
@@ -34,7 +34,7 @@ Content-Type: application/json
 }
 
 ### Update a category with PATCH
-PATCH  http://localhost:8000/v1/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
+PATCH  http://localhost:8000/api/v1/product/products/categories/01HATYBZ3Z4E7S98RY12GK4Q4S/
 Content-Type: application/json
 
 {   
@@ -42,29 +42,29 @@ Content-Type: application/json
 }
 
 ### Delete a category
-DELETE http://localhost:8000/v1/categories/01HAVH3Q2E38K6FE6XNEDNQZ12/
+DELETE http://localhost:8000/api/v1/product/products/categories/01HAVH3Q2E38K6FE6XNEDNQZ12/
 
 
 
 #Products =================================================
 ### Get all products
-GET http://localhost:8000/v1/products/01HATYSXKTTCHT4X51G63YK5NA/variants
+GET http://localhost:8000/api/v1/product/products/
 Connection: application/json
 
 ### Create a new product
-POST http://localhost:8000/v1/products/
+POST http://localhost:8000/api/v1/product/products/
 Content-Type: application/json
 
 {
-    "name": "Laptop",
-    "description": "A powerful laptop",
+    "name": "Lenovo Lpatop",
+    "description": "A laptop",
     "price": 10000.00,
     "user_id": "user123",
-    "category": "01HATY6RADG6X2FDXYWYDBT3J3",
+    "category": "018abd4e-c95f-d298-9417-41025980c5be"
 }
 
 ### Update a product with PUT
-PUT  http://localhost:8000/v1/products/01HATYSXKTTCHT4X51G63YK5NA/
+PUT  http://localhost:8000/api/v1/product/products/01HATYSXKTTCHT4X51G63YK5NA/
 Content-Type: application/json
 
 {
@@ -77,25 +77,26 @@ Content-Type: application/json
 }
 
 ### Update a product with PATCH
-PATCH  http://localhost:8000/v1/products/01HATYTEWP37SHW3S4KC6BNYJR/
+PATCH  http://localhost:8000/api/v1/product/products/01HATYSXKTTCHT4X51G63YK5NA/
 Content-Type: application/json
 
 {
     "name": "Dell Laptop",
     "description": "A powerful Dell laptop",
-    "price": "10000.00"
+    "price": "10000.00",
+    "variant": ["01HAVJTZG7WC8Y155AEREE2PVT"]
 }
 
 ### Delete a product
-DELETE http://localhost:8000/v1/products/01HATYTEWP37SHW3S4KC6BNYJR/
+DELETE http://localhost:8000/api/v1/product/products/01HATYTEWP37SHW3S4KC6BNYJR/
 
 
 #Reviews =================================================
 ### Get all reviews
-GET http://localhost:8000/v1/reviews/
+GET http://localhost:8000/api/v1/product/products/reviews/
 
 ### Create new review
-POST http://localhost:8000/v1/reviews/
+POST http://localhost:8000/api/v1/product/products/reviews/
 Content-Type: application/json
 
 {
@@ -105,7 +106,7 @@ Content-Type: application/json
 }
 
 ### Update review with PUT
-PUT http://localhost:8000/v1/reviews/01HAVHGJMADS8RM9P9VAH360BK/
+PUT http://localhost:8000/api/v1/product/products/reviews/01HAVHGJMADS8RM9P9VAH360BK/
 Content-Type: application/json
 
 {
@@ -115,7 +116,7 @@ Content-Type: application/json
 }
 
 ### Update review with PATCH
-PATCH http://localhost:8000/v1/reviews/01HAVHGJMADS8RM9P9VAH360BK/
+PATCH http://localhost:8000/api/v1/product/products/reviews/01HAVHGJMADS8RM9P9VAH360BK/
 Content-Type: application/json
 
 {
@@ -126,10 +127,10 @@ Content-Type: application/json
 # Variant ==================================================
 
 ### Get all variants
-GET http://localhost:8000/v1/variants
+GET http://localhost:8000/api/v1/product/variants
 
 ### Create a variant
-POST http://localhost:8000/v1/variants/
+POST http://localhost:8000/api/v1/product/products/variants/
 Content-Type: application/json
 
 {
@@ -138,7 +139,7 @@ Content-Type: application/json
 }
 
 ### Update a variant with PUT
-PUT http://localhost:8000/v1/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
+PUT http://localhost:8000/api/v1/product/products/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
 Content-Type: application/json
 
 {
@@ -148,15 +149,15 @@ Content-Type: application/json
 }
 
 ### Delete a variant
-DELETE http://localhost:8000/v1/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
+DELETE http://localhost:8000/api/v1/product/products/variants/01HAVJDEZJS5DDYBY1P7PDBA57/
 
 
 # Option ===========================================================
 ### Get an Option
-Get http://localhost:8000/v1/options
+Get http://localhost:8000/api/v1/product/products/options
 
 ### Create an Option
-POST http://localhost:8000/v1/options/
+POST http://localhost:8000/api/v1/product/products/options/
 Content-Type: application/json
 
 {
@@ -164,4 +165,14 @@ Content-Type: application/json
     "product": "01HATYSXKTTCHT4X51G63YK5NA",
     "value": "Green",
     "price": 2000
+}
+
+#Image =================================================
+### Create an image
+GET http://localhost:8000/api/v1/product/images/
+Content-Type: application/json
+
+{
+    "url": "https://example.com",
+    "object_id": "bdc705c4-987a-43d4-92c1-ad9857d124f5"
 }

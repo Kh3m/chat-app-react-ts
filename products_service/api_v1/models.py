@@ -1,5 +1,5 @@
+import uuid
 from django.db import models
-from django_ulid.models import default, ULIDField
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -7,7 +7,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 class Category(models.Model):
     """Represents a category for products."""
-    id = ULIDField(default=default, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     description = models.TextField()
@@ -28,10 +28,10 @@ class Category(models.Model):
 
 class Image(models.Model):
     """Represents an image associated with a product or variant."""
-    id = ULIDField(default=default, primary_key=True)
-    url = models.CharField(max_length=255)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    image_url = models.CharField(max_length=255)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = ULIDField()
+    object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
@@ -48,7 +48,7 @@ class Image(models.Model):
 
 class Product(models.Model):
     """Represents a product."""
-    id = ULIDField(default=default, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=2)
@@ -77,7 +77,7 @@ class Product(models.Model):
 
 class Review(models.Model):
     """Represents a review for a product"""
-    id = ULIDField(default=default, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=30)
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="product_reviews")
@@ -99,7 +99,7 @@ class Review(models.Model):
 
 class Variant(models.Model):
     """Represents a variant for one or more products"""
-    id = ULIDField(default=default, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True)
     products = models.ManyToManyField(
         "Product", related_name="products_variants", null=True)
@@ -116,7 +116,7 @@ class Variant(models.Model):
 
 class Option(models.Model):
     """Represents an option or attribute of a product's variation"""
-    id = ULIDField(default=default, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     value = models.CharField(max_length=30, unique=True)
