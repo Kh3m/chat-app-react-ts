@@ -8,6 +8,11 @@ class OrderManager(models.Manager):
         return super(OrderManager, self).get_queryset().filter(is_payment_successful=True)
 
 
+class OrderItemsManager(models.Manager):
+    def get_queryset(self):
+        return super(OrderItemsManager, self).get_queryset(order__is_payment_successful=True)
+
+
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -20,6 +25,7 @@ class Order(TimeStampedModel):
     STATUS = (
         ("Pending", "Pending"),
         ("Shipped", "Shipped"),
+        ("Cancelled", "Cancelled"),
         ("Delivered", "Delivered"),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -35,6 +41,7 @@ class Order(TimeStampedModel):
 
     class Meta:
         db_table = "orders"
+        ordering = ['order_total_price']
 
 
 class OrderItem(TimeStampedModel):
@@ -46,8 +53,8 @@ class OrderItem(TimeStampedModel):
     is_item_ordered = models.BooleanField(default=False)
     quantity = models.IntegerField()
 
+    objects = OrderItemsManager
+
     class Meta:
         db_table = 'order_items'
-
-
-
+        ordering = ['item_price']
