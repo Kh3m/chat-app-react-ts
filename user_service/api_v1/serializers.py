@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 
@@ -12,28 +13,32 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
-    profile = serializers.HyperlinkedIdentityField(
-        view_name='profile-detail', format="html", read_only=True)
+    profile = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         exclude = ('groups', 'username', 'user_permissions', 'is_staff')
 
+    def get_profile(self, instance):
+        request = self.context['request']
+        return request.build_absolute_uri(reverse('profile-detail', kwargs={'pk': instance.profile.pk}))
+
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
-    user = serializers.HyperlinkedIdentityField(
-        view_name="user-detail", format="html", read_only=True)
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
         fields = '__all__'
 
+    def get_user(self, instance):
+        request = self.context['request']
+        return request.build_absolute_uri(reverse('user-detail', kwargs={'pk': instance.user.pk}))
+
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
-    user = serializers.HyperlinkedIdentityField(
-        view_name="user-detail", format="html", read_only=True)
 
     class Meta:
         model = Address

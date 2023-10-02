@@ -12,6 +12,9 @@ class User(AbstractUser):
     phone = PhoneNumberField(null=True)
     profile = models.OneToOneField(
         "Profile", on_delete=models.SET_NULL, null=True, related_name='user_profile')
+    username = models.CharField(
+        max_length=60, unique=True, null=True)
+    email = models.EmailField(max_length=320, unique=True, null=False)
 
     def __str__(self):
         return self.first_name
@@ -53,9 +56,9 @@ class Address(models.Model):
 
 
 def create_groups(sender, **kwargs):
-    Group.objects.get_or_create(name='Admins')
-    Group.objects.get_or_create(name='Super Admins')
-    Group.objects.get_or_create(name='Field Workers')
+    Group.objects.get_or_create(name='admins')
+    Group.objects.get_or_create(name='super_admins')
+    Group.objects.get_or_create(name='field_workers')
 
 
 models.signals.post_migrate.connect(create_groups)

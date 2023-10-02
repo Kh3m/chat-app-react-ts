@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth.models import Group
 from drf_spectacular.utils import extend_schema
 
 
@@ -16,19 +17,68 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        # Automatically creates a profile for a user
-        Profile.objects.create(user=user, picture="image_url")
+        # Automatically creates a profile for a user, if one does not exist
+        profile = Profile.objects.filter(user=user).first()
+        if not profile:
+            profile = Profile.objects.create(user=user, picture="image_url")
+            user.profile = profile
+            user.save()
 
     @extend_schema(request=GroupSerializer, responses=GroupSerializer)
-    @action(detail=True, methods=['get'], url_path='groups')
+    @action(detail=True, methods=['get', 'post', 'put'], url_path='groups')
     def groups(self, request, pk=None):
-        """Get groups a user belongs to."""
-        user = self.get_object()
-        groups = user.groups.all()
-        serializer = GroupSerializer(groups, many=True)
-        return Response({'user_id': user.id, 'groups': serializer.data})
+        """
+        Mange user groups.
 
-    # Commented out. I don't think this is necessary:
+        **GET**
+        : Retieve groups a user belongs to
+
+        **POST**
+        : Add a user to a group
+
+        **PUT**
+        : Remove a user from a group
+        """
+        user = self.get_object()
+
+        if request.method == 'GET':
+            groups = user.groups.all()
+            serializer = GroupSerializer(groups, many=True)
+            return Response({'user_id': user.id, 'groups': serializer.data})
+
+        elif request.method == 'POST':
+            group_name = request.data.get('name')
+            if not group_name:
+                return Response({'error': 'Invalid request data. Missing group name.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                group = Group.objects.get(name=group_name)
+                if group not in user.groups.all():
+                    user.groups.add(group)
+                    user.save()
+                    return Response({'message': f"User added to {group.name}'s group successfully"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error': f'User is already a member of {group.name}'})
+            except Group.DoesNotExist:
+                return Response({'error': f'The group {group_name} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        elif request.method == 'PUT':
+            group_name = request.data.get('name')
+            if not group_name:
+                return Response({'error': 'Invalid request data. Missing group name.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                group = Group.objects.get(name=group_name)
+                if group in user.groups.all():
+                    user.groups.remove(group)
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+                else:
+                    return Response({'error': f"User not a member of {group.name}' group"})
+
+            except Group.DoesNotExist:
+                return Response({'error': f'Group with name {group_name} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Commented out. I don't think it's necessary:
     """"
     @extend_schema(request=ProfileSerializer, responses=ProfileSerializer)
     @action(detail=True, methods=['get', 'put', 'patch', 'delete'], url_path='profile')
