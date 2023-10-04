@@ -8,6 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
 from drf_spectacular.utils import extend_schema
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -117,3 +119,8 @@ class AddressViewSet(viewsets.ModelViewSet):
     """Manage Profiles"""
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
+
+
+class GoogleLogin(SocialLoginView):
+    """Custom login view for authenticating users using Google OAuth2"""
+    adapter_class = GoogleOAuth2Adapter
