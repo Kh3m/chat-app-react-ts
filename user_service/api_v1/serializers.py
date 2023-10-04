@@ -21,7 +21,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_profile(self, instance):
         request = self.context['request']
-        return request.build_absolute_uri(reverse('profile-detail', kwargs={'pk': instance.profile.pk}))
+        if instance.profile:
+            return request.build_absolute_uri(reverse('profile-detail', kwargs={'pk': instance.profile.id}))
+        return None
 
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,7 +36,9 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_user(self, instance):
         request = self.context['request']
-        return request.build_absolute_uri(reverse('user-detail', kwargs={'pk': instance.user.pk}))
+        if instance.user:
+            return request.build_absolute_uri(reverse('user-detail', kwargs={'pk': instance.user.id}))
+        return None
 
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
