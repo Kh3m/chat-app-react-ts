@@ -1,0 +1,5 @@
+migrations
+*.rest
+venv
+schema.yml
+.vscode
