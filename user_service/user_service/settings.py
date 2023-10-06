@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',
 
+    'corsheaders',
     'drf_spectacular',
     "phonenumber_field",
 
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
+    'corsheaders.middleware.CorsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
 ]
 
@@ -183,6 +185,8 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 LOGIN_DIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/api/v1/"
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # REST_AUTH = {
