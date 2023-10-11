@@ -4,12 +4,16 @@ from api_v1.serializers import GroupSerializer, AddressSerializer
 
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiTypes
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -124,3 +128,35 @@ class AddressViewSet(viewsets.ModelViewSet):
 class GoogleLogin(SocialLoginView):
     """Custom login view for authenticating users using Google OAuth2"""
     adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:3000/"
+    client_class = OAuth2Client
+
+
+class Generate_user_cert(APIView):
+    """
+    Generates user certificate based on a provided JWT token..
+    """
+
+    def post(self, request, format=None):
+        token = request.data.get('token', None)
+        if not token:
+            return Response({"error": "Token not provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            access_token = AccessToken(token)
+            access_token.verify()
+
+            decoded_token = access_token.payload
+
+            user = User.objects.get(id=decoded_token['user_id'])
+
+            certificate = {
+                'user_id': str(user.id),
+                'expiration': decoded_token['exp'],
+                'groups': [group.name for group in user.groups.all()],
+                'permissions': user.get_all_permissions()
+            }
+
+            return Response(certificate, status=status.HTTP_200_OK)
+        except InvalidToken as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
