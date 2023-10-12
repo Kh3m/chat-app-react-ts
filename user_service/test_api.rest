@@ -1,0 +1,140 @@
+@base_url = http://localhost:8000/api/v1
+@user_id = 41660e3e-717f-4f2a-9496-dd16f0bc2da2
+@profile_id = 056a8623-b1b2-4fc8-85f4-7b38d68b7229
+
+#=================================================================
+Test groups
+#=================================================================
+
+### Retrieve User Groups
+GET {{base_url}}/users/{{user_id}}/groups/
+
+### Add User to Group
+POST {{base_url}}/users/{{user_id}}/groups/
+Content-Type: application/json
+
+{
+    "name": "Admins"
+}
+
+### Remove User from Group
+PUT {{base_url}}/users/{{user_id}}/groups/
+Content-Type: application/json
+
+{
+    "name": "Admins"
+}
+
+#=================================================================
+Test user profile and address
+#=================================================================
+@base_url = http://localhost:8000/api/v1
+
+### Retrieve User Profile
+GET {{base_url}}/profiles/{{profile_id}}/
+
+### Update User Profile
+PUT {{base_url}}/profiles/{{profile_id}}/
+Content-Type: application/json
+
+{
+    "bio": "New bio",
+    "picture": "new_picture_url"
+}
+
+### Retrieve User Addresses
+GET {{base_url}}/addresses/?user_id={{user_id}}/
+
+### Add User Address
+POST {{base_url}}/addresses/
+Content-Type: application/json
+
+{
+    "user": "{{user_id}}",
+    "street_address": "123 Main St",
+    "city": "Sample City",
+    "state": "Sample State",
+    "country": "Sample Country",
+    "zip_code": 12345,
+    "is_default": true
+}
+
+### Remove User Address
+DELETE {{base_url}}/addresses/{{address_id}}/
+
+#=================================================================
+Test user
+#=================================================================
+
+### Create a User
+POST {{base_url}}/users/
+Content-Type: application/json
+
+{
+    "password": "testpassword",
+    "first_name": "Chigozirim",
+    "last_name": "Igweamaka",
+    "email": "zirim@example.com",
+    "is_vendor": false
+}
+
+### Retrieve User by ID
+GET {{base_url}}/users/{{user_id}}/
+
+### Update User Profile
+PATCH {{base_url}}/users/de537aac-b475-40f6-abc9-246227492a9d/
+Content-Type: application/json
+
+{
+    "first_name": "Updated First Name",
+    "last_name": "Updated Last Name"
+}
+
+### Delete a User
+DELETE {{base_url}}/users/{{user_id}}/
+
+
+#=================================================================
+Test SignUp, Signout, Signin
+#=================================================================
+###
+POST {{base_url}}/signup/
+Content-Type: application/json
+
+{
+    "username": "example_user",
+    "email": "example@example.com",
+    "password1": "your_password",
+    "password2": "your_password"
+}
+
+
+### Register API Endpoint
+
+POST {{base_url}}/auth/registration/
+Content-Type: application/json
+
+{
+    "email": "example_user@gmail.com",
+    "password1": "your_password",
+    "password2": "your_password"
+}
+
+### Login API Endpoint
+
+POST {{base_url}}/auth/login/
+Content-Type: application/json
+
+{
+    "email": "example_user@gmail.com",
+    "password": "your_password"
+}
+
+### Get user cert
+
+POST {{base_url}}/auth/cert/
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjk3MDIzMzcyLCJpYXQiOjE2OTcwMjE1NzIsImp0aSI6ImU2NjUwNzEwZGUzYzQ3ZThiMzM2YjA0ZmM5YjNhZDJmIiwidXNlcl9pZCI6IjY1NGEwY2JkLWQ4YmEtNGM0OC1hMDI0LWI3MDQyZjc5MTUzNyJ9.Da0DUzofxHBvQVmtag9W9tbLo80D5BtuUrcyTMcEjd8"
+}

@@ -1,0 +1,13 @@
+{
+  "endpoints": {
+    "/product": {
+      "GET": { "permissions": ["ANY"], "groups": ["ANY"] },
+      "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+    },
+    "/product/id": {
+      "GET": { "permissions": ["ANY"], "groups": ["ANY"] },
+      "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
+      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+    }
+  }
+}
