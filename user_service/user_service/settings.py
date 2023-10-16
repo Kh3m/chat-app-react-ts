@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,10 +41,12 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',
 
+    'corsheaders',
     'drf_spectacular',
     "phonenumber_field",
 
     'rest_framework',
+    'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -65,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
+    'corsheaders.middleware.CorsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
 ]
 
@@ -152,6 +156,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
@@ -184,8 +189,27 @@ ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_DIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/api/v1/"
 
+CORS_ORIGIN_ALLOW_ALL = True
 
-# REST_AUTH = {
-#     'USE_JWT': True,
-#     'JWT_AUTH_COOKIE': 'jwt-auth',
-# }
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
+    'JWT_AUTH_HTTPONLY': False,
+    'JWT_AUTH_RETURN_EXPIRATION': True,
+    'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh',
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+}
+
+
+# Celery settings
+# CELERY_BROKER_URL = 'pyamqp://guest:guest@localhost//'
+# CELERY_RESULT_BACKEND = 'rpc://'
