@@ -1,13 +1,15 @@
 {
   "endpoints": {
     "/product": {
-      "GET": { "permissions": ["ANY"], "groups": ["ANY"] },
-      "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+      "GET": { "authenticate": false, "permissions": ["ANY"], "groups": ["ANY"] },
+      "PUT": { "authenticate": false, "permissions": ["OWNER"], "groups": ["ADMINS"] }
     },
-    "/product/id": {
+    "/product/{id}": {
       "GET": { "permissions": ["ANY"], "groups": ["ANY"] },
       "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
-      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
+      "PATCH": {},
+      "GET-POST-PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
     }
   }
 }
