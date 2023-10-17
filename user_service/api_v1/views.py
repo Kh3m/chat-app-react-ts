@@ -13,7 +13,7 @@ from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -152,11 +152,12 @@ class Generate_user_cert(APIView):
 
             certificate = {
                 'user_id': str(user.id),
-                'expiration': decoded_token['exp'],
+                'exp': decoded_token['exp'],
+                'is_active': user.is_active,
                 'groups': [group.name for group in user.groups.all()],
                 'permissions': user.get_all_permissions()
             }
 
             return Response(certificate, status=status.HTTP_200_OK)
-        except InvalidToken as e:
+        except TokenError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
