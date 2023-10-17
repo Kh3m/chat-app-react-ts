@@ -19,8 +19,8 @@ class Store(models.Model):
     business_license_number = models.CharField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    members = models.ManyToManyField("Member", related_name='store_members')
-    socials = models.ManyToManyField("Social", related_name='store_socials')
+    members = models.ManyToManyField("Member", related_name='store_members', null=True)
+    socials = models.ManyToManyField("Social", related_name='store_socials', null=True)
 
 
 class Member(models.Model):
