@@ -2,10 +2,11 @@
 The Authorization and Authentication Service is responsible for providing access control and authentication functionalities within the Fixam's microservices.  It verifies user credentials and enforces authorization policies based on predefined rules.
 
 ## Table of Contents
-- Policy File
-- Writing Policies
+- [Policy File](#policy-file)
+- [Writing Policies](#writing-policies)
 - [Usage](#usage)
-- API Endpoint
+- [API Endpoint](#api-endpoint)
+- [Tests](#tests)
 
 ## Policy File
 The service utilizes a JSON policy file to determine access permissions for different endpoints within a microservice. The policy file defines the permissions, groups, and authentication requirements for each endpoint. Each service should have a corresponding policy file defined.
