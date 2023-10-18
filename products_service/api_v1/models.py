@@ -53,6 +53,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=2)
     user_id = models.CharField(max_length=30)
+    store_id = models.CharField(max_length=30)
     reviews = models.ManyToManyField(
         "Review", related_name="products_reviews", null=True)
     variants = models.ManyToManyField(
