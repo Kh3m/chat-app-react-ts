@@ -1,5 +1,5 @@
 # Auth Service
-The Authorization and Authentication Service is responsible for providing access control and authentication functionalities within the Fixam's microservices.  It verifies user credentials and enforces authorization policies based on predefined rules.
+The Auth Service is responsible for providing access control and authentication functionalities within the Fixam's microservices.  It verifies user credentials and enforces authorization policies based on predefined rules.
 
 ## Table of Contents
 - [Policy File](#policy-file)
