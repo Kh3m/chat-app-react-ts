@@ -1,0 +1,16 @@
+{
+    "endpoints": {
+      "/users": {
+        "GET": { "permissions": [], "groups": [] },
+        "POST": { "authenticate": true, "permissions": [], "groups": [] },
+        "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
+        "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
+      },
+      "/users/{id}": {
+        "GET": { "permissions": ["OWNER"], "groups": ["admins"] },
+        "POST": { "authenticate": true, "permissions": [], "groups": [] },
+        "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
+        "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
+      }
+    }
+  }
