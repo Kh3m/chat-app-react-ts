@@ -84,9 +84,9 @@ WSGI_APPLICATION = "products_service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "fxm_ps_dev_db",
-        "USER": "fxm_ps_dev",
-        "PASSWORD": "fxm_ps_dev_pwd",
+        "NAME": "fxm_dev_db",
+        "USER": "fxm_dev",
+        "PASSWORD": "fxm_dev_pwd",
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
