@@ -9,13 +9,13 @@ def get_user_cert(auth_token):
     Get's a user's certificate.
     Returns user's certificate if no error. Otherwise, None
     """
-    url = "http://127.0.0.1:8000/api/v1/auth/cert/"
+    url = "http://127.0.0.1:8001/api/v1/auth/cert/"
     data = {'token': auth_token}
     response = requests.post(url=url, data=data)
 
     if response.status_code != 200:
         logger.error({
-            'message': f"Failed to get user cert for auth token: {auth_token}",
+            'message': f"Failed to get user cert for auth token: {auth_token[:8]}...",
             'detail': f"Error {response.status_code} - {response.json()['error']}"
         })
         return None
@@ -28,10 +28,12 @@ def check_user_ownership(resource_id, user_id):
     Returns True if the user with the user_id is the
     owner of the resource with ID resouce_id.
     """
-    url = f"http://localhost:8000/api/v1/users/{resource_id}/"
+    url = f"http://localhost:8001/api/v1/users/{resource_id}/"
     response = requests.get(url=url)
 
     if response.status_code != 200:
+        print('Reached Here')
+        print(response.status_code)
         logger.error({
             'message': f"Failed to verify ownership with Users Service",
             'detail': f"Error {response.status_code} - {response.json()['error']}"
