@@ -41,6 +41,7 @@ def evaluate_policy(auth_token=None, req_path=None, method=None, service=None):
                 200: Authorized access.
                 404: Requested service doesn't exist
                 401: Authentication failure.
+                429: Too many request (user has exceeded rate limit)
                 403: Forbidden (unauthorized) access.
                 500: Failed to load policy for the service (internal server error).
             - message: Message for the response
