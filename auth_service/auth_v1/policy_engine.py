@@ -2,9 +2,12 @@ import logging
 from datetime import datetime
 from django.core.cache import cache
 
-from .utils.helpers import check_required_groups, check_required_permissions
-from .utils.helpers import get_ids_from_path, load_service_policy
+from auth_v1.utils.rate_limiter import RateLimiter
+
+from .utils.helpers import response
 from .utils.inter_communication import communicate
+from .utils.helpers import get_ids_from_path, load_service_policy
+from .utils.helpers import check_required_groups, check_required_permissions
 
 logger = logging.getLogger("auth_v1")
 POLICY_DIR = "/home/chigozirim/Documents/Leptons/fixam/auth_service/auth_v1/policies"
@@ -16,7 +19,7 @@ policies = {
 }
 
 
-def evaluate_policy(auth_token, req_path, method, service):
+def evaluate_policy(auth_token=None, req_path=None, method=None, service=None):
     """
     Evaluate the access policy for a requested resouce and user.
 
@@ -32,22 +35,33 @@ def evaluate_policy(auth_token, req_path, method, service):
         service (str): Micro service the requested resouce belongs to (e.g., "users")
 
     Returns:
-        tuple: A tuple indicating authorization status and HTTP status code.
+        dict: A dictionary containing authorization status, HTTP status code, and a message.
             - bool: True if the user is authorized to access the endpoint, False otherwise.
             - int: HTTP status code representing the outcome of the authorization check.
                 200: Authorized access.
+                404: Requested service doesn't exist
                 401: Authentication failure.
+                429: Too many request (user has exceeded rate limit)
                 403: Forbidden (unauthorized) access.
                 500: Failed to load policy for the service (internal server error).
+            - message: Message for the response
     """
-    service_policy_file = f"{policies[service]}.json"
+    service_policy_path = policies.get(service)
+    if service_policy_path is None:
+        logger.error({
+            "message": f'requested service [{service}] not found',
+            'detail': f"policies (dict) does not have the key '{service}'"
+        })
+        return response(False, 404, f'requested service [{service}] not found')
+
+    service_policy_file = f"{service_policy_path}.json"
     service_policy = load_service_policy(service_policy_file)
     if service_policy is None:
         logger.error({
             "message": f"Failed to load policy for {service}",
             'detail': f"Policy file not found: {service_policy_file}"
         })
-        return (False, 500)
+        return response(False, 500, f"Failed to load policy for {service}")
 
     resource_endpoint, resource_policy = get_resource_policy(
         service_policy, req_path, method)
@@ -55,7 +69,7 @@ def evaluate_policy(auth_token, req_path, method, service):
     if not resource_policy:
         detail = {'req_path': req_path, 'method': method}
         logger.info(f"No policy found for resource: {detail}")
-        return (False, 403)
+        return response(False, 403, 'No policy found for resource')
 
     must_authenticate = resource_policy.get('authenticate', True)
     required_groups = resource_policy.get('groups', [])
@@ -64,13 +78,19 @@ def evaluate_policy(auth_token, req_path, method, service):
     user_cert = authenticate(auth_token)
     if not user_cert and must_authenticate:
         logger.info(f"Failed to authenticate. Auth token: {auth_token}")
-        return (False, 401)
+        return response(False, 401, 'Authentication failed')
+
+    # Check user rate limit
+    rate_limiter = RateLimiter(service_policy['rate_limit'])
+    if not rate_limiter.allow(user_cert['user_id'], user_cert['groups']):
+        logger.info(f"User ({user_cert['user_id']}) rate limit reached")
+        return response(False, 429, "Too many requests")
 
     # Check required groups
     if required_groups and not check_required_groups(user_cert, required_groups):
         logger.info(
             f"User ({user_cert['user_id']}) doesn't belong to any of the required groups")
-        return (False, 403)
+        return response(False, 403, 'Unauthorized')
 
     # Check required permissions
     ids = get_ids_from_path(req_path, resource_endpoint)
@@ -79,9 +99,9 @@ def evaluate_policy(auth_token, req_path, method, service):
             check_required_permissions(service, user_cert, required_permissions, resource_id):
         logger.info(
             f"User ({user_cert['user_id']}) doesn't have the required permissions")
-        return (False, 403)
+        return response(False, 403, 'Unauthorized')
 
-    return (True, 200)
+    return response(True, 200, 'Success')
 
 
 def authenticate(auth_token):
@@ -92,6 +112,8 @@ def authenticate(auth_token):
     """
 
     # Generate cache key
+    if len(auth_token) < 9:
+        return None
     cache_key = auth_token.split('.')[-1] \
         if '.' in auth_token else auth_token[8]
     user_cert = cache.get(cache_key)
@@ -125,10 +147,14 @@ def matches_endpoint(endpoint, req_path):
     req_path_parts = req_path_parts[:-1] if \
         endpoint_parts[-1] == '' else req_path_parts
 
-    if len(endpoint_parts) != len(req_path_parts):
+    if len(endpoint_parts) != len(req_path_parts) \
+            and endpoint_parts[-1] != '*':
+        print(endpoint_parts[-1])
         return False
 
     for e_part, r_part in zip(endpoint_parts, req_path_parts):
+        if e_part == '*':
+            break
         if e_part != "{id}" and e_part != r_part:
             return False
 
@@ -155,9 +181,16 @@ def get_resource_policy(service_policy, req_path, method):
         # try matching it with endpoints that have patterns
         endpoints = service_policy['endpoints']
         for endpoint, policy in endpoints.items():
-            if endpoint.endswith('*'):
-                endpoint = endpoint[:-1]
             if matches_endpoint(endpoint, req_path):
+                if method not in policy.keys():
+                    # Check if the method is part of combined methods, e.g., "PUT-PATCH".
+                    # In this case, the method can be PATCH.
+                    all_combined_methods = [
+                        key for key in policy if '-' in key and method in key.split('-')]
+                    for combined_methods in all_combined_methods:
+                        if method in combined_methods:
+                            method = combined_methods
+                            break
                 resource_policy = policy.get(method, {})
                 if resource_policy:
                     return (endpoint, resource_policy)

@@ -57,6 +57,14 @@ def check_required_permissions(service, user_cert, required_permissions, resourc
               requirements. Otherwise, False
     """
     for permission in required_permissions:
+        perms_that_need_resource_id = ['OWNER', 'STORE_MEMBER']
+        if permission in perms_that_need_resource_id and resource_id is None:
+            logger.error({
+                'message': "resouce_id is None",
+                'detail': f"Cannot check {permission} when resource_id is None"
+            })
+            continue
+
         if permission == 'OWNER':
             check_ownership = communicate[service]['check_ownership']
             if check_ownership(resource_id, user_cert['user_id']):
@@ -71,3 +79,11 @@ def check_required_permissions(service, user_cert, required_permissions, resourc
             return True
 
     return False
+
+
+def response(status=False, status_code=None, message=None):
+    return {
+        'status': status,
+        'status_code': status_code,
+        'message': message
+    }

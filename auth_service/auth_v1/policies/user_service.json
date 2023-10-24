@@ -1,16 +1,21 @@
 {
-    "endpoints": {
-      "/users": {
-        "GET": { "permissions": [], "groups": [] },
-        "POST": { "authenticate": true, "permissions": [], "groups": [] },
-        "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
-        "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
-      },
-      "/users/{id}": {
-        "GET": { "permissions": ["OWNER"], "groups": ["admins"] },
-        "POST": { "authenticate": true, "permissions": [], "groups": [] },
-        "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
-        "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
-      }
+  "rate_limit": {
+    "default": "2/s",
+    "admins": "10/m",
+    "super_admins": "5/s"
+  },
+  "endpoints": {
+    "/users/*": {
+      "GET": { "permissions": [], "groups": [] },
+      "POST": { "authenticate": true, "permissions": [], "groups": [] },
+      "PUT": { "permissions": ["OWNER"], "groups": [] },
+      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
+    },
+    "/users/{id}": {
+      "GET": { "permissions": ["OWNER"], "groups": [] },
+      "POST": { "authenticate": true, "permissions": [], "groups": [] },
+      "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
+      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"]}
     }
   }
+}

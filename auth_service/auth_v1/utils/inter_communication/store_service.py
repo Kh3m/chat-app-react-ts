@@ -10,7 +10,7 @@ def check_membership(store_id, user_id):
     Returns True is a user is a member of a specific store,
     False otherwise.
     """
-    url = f"http://localhost:8000/api/v1/stores/{store_id}/"
+    url = f"http://localhost:8003/api/v1/stores/{store_id}/"
     response = requests.get(url=url)
 
     if response.status_code != 200:
