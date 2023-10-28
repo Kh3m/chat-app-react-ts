@@ -8,18 +8,18 @@ from api_v1.views import GoogleLogin, Generate_user_cert
 
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename="user")
-router.register(r'users/profiles', ProfileViewSet, basename='profile')
-router.register(r'users/adresses', AddressViewSet, basename="address")
+router.register(r'profiles', ProfileViewSet, basename='profile')
+router.register(r'adresses', AddressViewSet, basename="address")
+router.register(r'', UserViewSet, basename="user")
 
 urlpatterns = [
-    path('users/auth/', include('dj_rest_auth.urls')),
-    path('users/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('auth/', include('dj_rest_auth.urls')),
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path("signup/", signup, name="socialaccount_signup"),
-    path('users/auth/google/', GoogleLogin.as_view(), name='google_login'),
-    path('users/auth/cert/', Generate_user_cert.as_view(), name='user_cert'),
-    path('users/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('users/api-docs/',
+    path('auth/google/', GoogleLogin.as_view(), name='google_login'),
+    path('auth/cert/', Generate_user_cert.as_view(), name='user_cert'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api-docs/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('', include(router.urls)),
 ]
