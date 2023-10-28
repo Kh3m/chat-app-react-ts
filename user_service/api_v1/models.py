@@ -1,8 +1,11 @@
+import re
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from phonenumber_field.modelfields import PhoneNumberField
 
+from api_v1.utils.helpers import validate_iso_code
+      
 
 class User(AbstractUser):
     CHOICES = [(False, 'Customer'), (True, 'Vendor'),]
@@ -15,7 +18,9 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=60, unique=True, null=True)
     email = models.EmailField(max_length=320, unique=True, null=False)
+    addresses = models.ManyToManyField("Address", related_name="addresses")
 
+    
     def __str__(self):
         return self.first_name
 
@@ -39,11 +44,11 @@ class Profile(models.Model):
 
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey("User", on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     street_address = models.CharField(max_length=255, null=True)
     city = models.CharField(max_length=70)
     state = models.CharField(max_length=70)
-    country = models.CharField(max_length=70, default="Nigeria")
+    country = models.CharField(max_length=3, validators=[validate_iso_code])
     zip_code = models.IntegerField(null=True)
     is_default = models.BooleanField(default=False)
 
@@ -53,8 +58,7 @@ class Address(models.Model):
     def __repr__(self):
         obj = vars(self)
         return str(obj)
-
-
+       
 def create_groups(sender, **kwargs):
     Group.objects.get_or_create(name='admins')
     Group.objects.get_or_create(name='super_admins')
