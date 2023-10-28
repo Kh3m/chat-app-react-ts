@@ -7,7 +7,7 @@ from api_v1.models import User, Profile, Address
 from api_v1.utils.custom_fields import CustomHyperLinkedModelSerializer
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(CustomHyperLinkedModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
@@ -55,7 +55,7 @@ class UserSerializer(CustomHyperLinkedModelSerializer):
             return []
 
 
-class ProfileSerializer(serializers.HyperlinkedModelSerializer):
+class ProfileSerializer(CustomHyperLinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
     user = serializers.SerializerMethodField()
 
