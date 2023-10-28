@@ -3,3 +3,5 @@ migrations
 venv
 schema.yml
 .vscode
+.env
+__pycache__
