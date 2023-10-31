@@ -16,9 +16,10 @@ from . import views
 urlpatterns = [
     path('carts/', views.CreateUserCartView.as_view(), name='cart.create'),
     path('carts/all/', views.ListCartView.as_view(), name='cart.all'),
+    path('options/all/', views.ListOptionsView.as_view(), name='options.all'),
+    path('carts/<uuid:pk>/items/', views.AddCartItemView.as_view(), name='cart.item.add'),
     path('carts/<uuid:pk>/', views.RetrieveDeleteCartView.as_view(), name='cart.retrieve.destroy'),
     path('carts/user/<int:user_id>/', views.RetrieveUserCartView.as_view(), name='cart.user.retrieve'),
-    path('carts/<uuid:pk>/items/', views.AddCartItemView.as_view(), name='cart.item.add'),
     path('carts/<uuid:cart_id>/items/<int:pk>/', views.RetrieveUpdateDestroyCartItemView.as_view(),
          name='cart.item.modify'),
 
