@@ -1,17 +1,22 @@
+import json
 import logging
+import redis
+from django.core.serializers.json import DjangoJSONEncoder
 
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from .models import Cart, CartItem, ItemOptions
-from .utils import get_existing_cart_item, merge_cart_items, set_guest_cart_id
+from .models import Cart, CartItem, ItemOption
+from .utils import get_existing_cart_item_redis, merge_cart_items, set_guest_cart_id
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 logger = logging.getLogger(__name__)
 
 
 class ItemOptionsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ItemOptions
+        model = ItemOption
         fields = ['id', 'attribute', 'value']
 
 
@@ -42,6 +47,11 @@ class CartItemQuantityUpdateSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'quantity', 'created_at', 'modified_at']
 
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than 0.")
+        return value
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     item_options = ItemOptionsSerializer(many=True, required=False)
@@ -52,27 +62,43 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         unique_together = ['prod_id', 'item_options']
 
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than 0.")
+        return value
+
     def create(self, validated_data):
         cart_id = self.context['cart_id']
-        logger.info(f"cart_id {cart_id} context received in CartItemSerializer")
-        cart = get_object_or_404(Cart, id=cart_id)  # Remove options from validated_data
-        item_options_data = validated_data.pop('item_options', [])  # Change field name to match the model
+        redis_key = f'cart:main:{cart_id}'
 
-        existing_cart_item = get_existing_cart_item(cart, validated_data['prod_id'], item_options_data)
+        cart_data_json = redis_client.get(redis_key)
+        cart = json.loads(cart_data_json.decode('utf-8'))
+        # if cart is None:
+        #     cart = get_object_or_404(Cart, id=cart_id)
+
+        logger.info(f"cart_id {cart_id} context received in CartItemSerializer")
+
+        # Remove options from validated_data
+        item_options_data = validated_data.pop('item_options', [])
+
+        existing_cart_item = get_existing_cart_item_redis(cart, validated_data['prod_id'], item_options_data)
         logger.info(f'get_existing_cart_item function returned {existing_cart_item}')
 
         if existing_cart_item:
-            merge_cart_items(existing_cart_item, validated_data['quantity'])
+            print('EXISTING CART ITEM AVAILABLE')
+            merge_cart_items(cart, existing_cart_item, validated_data['quantity'])
             cart_item = existing_cart_item
         else:
-            cart_item = CartItem(cart=cart, **validated_data)
+            logger.warning(f'No cart item with {item_options_data} found')
+            print(f'No cart item with {item_options_data} found')
+            cart_item = CartItem(cart_id=cart['id'], **validated_data)
             cart_item.save()  # Save the cart item to generate an ID
 
             # Create and associate ItemOptions instances
             for option_data in item_options_data:
-                ItemOptions.objects.create(cart_item=cart_item, **option_data)
+                ItemOption.objects.create(cart_item=cart_item, **option_data)
 
-            # Log the creation or merge of a cart item
+        # Log the creation or merge of a cart item
         logger.info(f"Cart with ID {cart_id} retrieved")
         return cart_item
 
@@ -91,4 +117,16 @@ class CustomCartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ['id', 'cart', 'prod_id', 'quantity', 'is_active']
+        fields = ['id', 'cart', 'item_options', 'prod_id', 'quantity', 'is_active']
+
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than 0.")
+        return value
+
+
+class CustomItemOptionsSerializer(serializers.ModelSerializer):
+    cart_item = CustomCartItemSerializer(read_only=True)
+    class Meta:
+        model = ItemOption
+        fields = ['id', 'cart_item', 'attribute', 'value', 'created_at']
