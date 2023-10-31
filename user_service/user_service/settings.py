@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+from decouple import Config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -100,7 +101,7 @@ WSGI_APPLICATION = "user_service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "fxm_dev_db",
+        "NAME": "fxm_us_dev",
         "USER": "fxm_dev",
         "PASSWORD": "fxm_dev_pwd",
         "HOST": "127.0.0.1",
@@ -198,6 +199,8 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,
     'JWT_AUTH_RETURN_EXPIRATION': True,
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh',
+    
+    'USER_DETAILS_SERIALIZER': 'api_v1.serializers.CustomUserDetailsSerializer'
 }
 
 
@@ -209,6 +212,23 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 }
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": Config('GOOGLE_AUTH_CLIENT_ID'),
+            "secret": Config('GOOGLE_AUTH_SECRET'),
+            "key": "",
+        },
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "VERIFIED_EMAIL": True,
+    },
+}
 
 # Celery settings
 # CELERY_BROKER_URL = 'pyamqp://guest:guest@localhost//'
