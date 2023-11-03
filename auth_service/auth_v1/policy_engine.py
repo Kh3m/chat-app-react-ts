@@ -10,7 +10,7 @@ from .utils.helpers import get_ids_from_path, load_service_policy
 from .utils.helpers import check_required_groups, check_required_permissions
 
 logger = logging.getLogger("auth_v1")
-POLICY_DIR = "/home/chigozirim/Documents/Leptons/fixam/auth_service/auth_v1/policies"
+POLICY_DIR = "/home/chigozirim/Documents/Leptons/auth_branch/fixam/auth_service/auth_v1/policies"
 
 # Associate microservice names with their respective policy file paths
 policies = {
@@ -75,6 +75,9 @@ def evaluate_policy(auth_token=None, req_path=None, method=None, service=None):
     required_groups = resource_policy.get('groups', [])
     required_permissions = resource_policy.get('permissions', [])
 
+    # Get user's cert
+    # User's cert is necessary if `groups` or `permissions` has been set in
+    # the resource policy.
     user_cert = authenticate(auth_token)
     if not user_cert and must_authenticate:
         logger.info(f"Failed to authenticate. Auth token: {auth_token}")
@@ -149,7 +152,6 @@ def matches_endpoint(endpoint, req_path):
 
     if len(endpoint_parts) != len(req_path_parts) \
             and endpoint_parts[-1] != '*':
-        print(endpoint_parts[-1])
         return False
 
     for e_part, r_part in zip(endpoint_parts, req_path_parts):
