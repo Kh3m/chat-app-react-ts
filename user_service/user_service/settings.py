@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from os import getenv
 from datetime import timedelta
 from pathlib import Path
@@ -256,6 +256,53 @@ SOCIALACCOUNT_PROVIDERS = {
             "access_type": "online",
         },
         "VERIFIED_EMAIL": True,
+    },
+}
+
+# Logs
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    print(LOG_DIR)
+    os.mkdir(LOG_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'users': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'users.log'),
+            'formatter': 'verbose',
+        },
+        'events': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'events.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'api_v1_users': {
+            'handlers': ['users'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'api_v1_events': {
+            'handlers': ['events'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 
