@@ -18,9 +18,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         the context data provided. The specific event published depends on the
         content of the 'context' dictionary.
 
-        If the 'context' dictionary includes an 'activate_url', an event related
-            to a new registration is published, providing information about the
-            user and the activation key.
+        If the 'context' dictionary includes an 'activate_url', nothing is done
 
         If the 'context' dictionary includes a 'password_reset_url', an event
             related to a password reset is published. This event contains the
@@ -32,17 +30,18 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
         """
         if 'activate_url' in context:
-            publishers.publish_new_registration(
-                context['user'], context['key'])
-            print(context.get('activate_url'))
+            # Don't send email; email confirmation is handled
+            # in signals
+            pass
 
         elif 'password_reset_url' in context:
             reset_url_parts = context.get('password_reset_url').split('/')
             if reset_url_parts[-1] == '':
                 reset_url_parts.pop()
 
+            email = str(context['user'].email)
             token, uidb64 = reset_url_parts[-1], reset_url_parts[-2]
-            publishers.publish_password_reset(token, uidb64)
+            publishers.publish_password_reset(email, token, uidb64)
 
         else:
             msg = self.render_mail(template_prefix, email, context)
