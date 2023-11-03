@@ -19,21 +19,28 @@ class RBMQ:
         self.port = getenv("RBMQ_PORT", 5672)
         self.host = getenv("RBMQ_HOST", "localhost")
 
+        # Establish the initial connection and channel
+        self.connection, self.channel = self.establish_connection()
+
     def establish_connection(self):
         parameters = pika.ConnectionParameters(host=self.host, port=self.port)
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
         channel.exchange_declare(
             exchange=self.exchange_name, exchange_type=self.exchange_type)
+
         return connection, channel
 
     def publish_event(self, event_data: dict, routing_key: str):
+        """
+        Publishes the provided event data to the RabbitMQ exchange using
+        the specified routing key.
+        """
         calling_file = inspect.stack()[2].filename.split('/')[-1]
         try:
-            _, channel = self.establish_connection()
             event_data["timestamp"] = str(datetime.now())
 
-            channel.basic_publish(
+            self.channel.basic_publish(
                 exchange=self.exchange_name,
                 routing_key=routing_key,
                 body=json.dumps(event_data)
@@ -57,25 +64,32 @@ class RBMQ:
             return False
 
     def consume_event(self, exchange, routing_key, on_message_callback):
-        """Subscribes to the specified exchange and routing key.
+        """
+        Subscribes to the specified RabbitMQ exchange and routing key, and it
+        invokes the provided callback function whenever a message is received.
 
         Args:
             exchange: The name of the exchange to subscribe to.
             routing_key: The routing key to subscribe to.
             on_message_callback: The callback function to be called when a message is received.
         """
-        connection, channel = self.establish_connection()
         queue_name = f'{routing_key}_queue'
         try:
-            channel.queue_declare(queue_name)
-            channel.exchange_declare(exchange, self.exchange_type)
-            channel.queue_bind(queue_name, exchange, routing_key)
-            channel.basic_consume(queue_name, on_message_callback)
+            self.channel.queue_declare(queue_name)
+            self.channel.exchange_declare(exchange, self.exchange_type)
+            self.channel.queue_bind(queue_name, exchange, routing_key)
+            self.channel.basic_consume(queue_name, on_message_callback)
 
-            channel.start_consuming()
+            self.channel.start_consuming()
         except pika.exceptions.ConnectionClosed as e:
             logger.log(f"Connection to RabbitMQ closed: {e}")
             time.sleep(5)
         except KeyboardInterrupt:
             # Close the channel and connection
-            connection.close()
+            self.close_connection()
+
+    def close_connection(self):
+        # Close the channel and connection gracefully
+        self.channel.stop_consuming()
+        self.connection.close()
+        logger.info("RabbitMQ connection closed gracefully")
