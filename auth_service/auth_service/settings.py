@@ -129,6 +129,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 
+# Logs
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    print(LOG_DIR)
+    os.mkdir(LOG_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -143,16 +149,27 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'auth': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'debug.log'),
+            'filename': os.path.join(LOG_DIR, 'auth.log'),
+            'formatter': 'verbose',
+        },
+        'events': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'events.log'),
             'formatter': 'verbose',
         },
     },
     'loggers': {
-        'auth_v1': {
-            'handlers': ['file'],
+        'api_v1': {
+            'handlers': ['auth'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'api_v1_events': {
+            'handlers': ['events'],
             'level': 'DEBUG',
             'propagate': True,
         },
