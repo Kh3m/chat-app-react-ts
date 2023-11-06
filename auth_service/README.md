@@ -1,9 +1,12 @@
-# Auth Service
+# Auth Service (v1)
 The Auth Service is responsible for providing access control and authentication functionalities within the Fixam's microservices.  It verifies user credentials and enforces authorization policies based on predefined rules.
 
 ## Table of Contents
 - [Policy File](#policy-file)
 - [Writing Policies](#writing-policies)
+  - [Policy Structure](#policy-structure)
+  - [Rate Limiting](#rate-limiting)
+  - [Endpoint Patterns](#endpoint-patterns)
 - [Usage](#usage)
 - [API Endpoint](#api-endpoint)
 - [Tests](#tests)
@@ -18,6 +21,11 @@ In order to structure policies to achieve the desired outcome, it's important to
 A policy should have the following structure:
 ```json
 {
+  "rate_limit": {
+    "default": "2/s",
+    "admins": "10/m",
+    "super_admins": "20/h"
+  },
   "endpoints": {
     "/example": {
       "HTTP_METHOD": {
@@ -30,14 +38,28 @@ A policy should have the following structure:
   }
 }
 ```
+- `rate_limit`: A dictionary containing rate limit settings for users of various groups.
 - `endpoints`: A dictionary containing endpoints as keys.
 - `/example`: An endpoint (e.g., "/example") to define policies for.
 - `HTTP_METHOD`: HTTP method (e.g., "GET", "POST", "PUT", "DELETE").
 - `permissions`: An array of permissions required to access the endpoint.
 - `groups`: An array of groups that the user must belong to.
 
+### Rate Limiting
+Rate limiting is applied to users based on their group memberships. Users who belong to none of the groups specified in the `rate_limit` setting will use the default rate limit.   
+From the policy above:
+- Users who belong to none of the specified groups will be able to make 2 requests per second.
+- Users who belong to the `admins` group will be able to make 10 requests per minute.
+- Users who belong to the `super_admins` group will be able to make 20 requests per hour.
+
+You can add or remove groups from the `rate_limit` setting at any time. For example, if you want to add a new group called editors with a rate limit of 5 requests per minute, you can simply add the following line to the rate_limit setting:
+```json
+"editors": "5/m"
+```
+You do not need to update any code to accommodate the new group(s).
+
 ### Endpoint Patterns
-For endpoints that follow a pattern, use the asterisk (\*) to denote a wildcard in the policy file and use `{id}` to denote points for ids. For example, to match all endpoints starting with "/store", use "/store/*". To match endpoints with an ID "/store/123-unique-id", use "/store/{id}".
+For endpoints that follow a pattern, use the asterisk (\*) to denote a wildcard in the policy file and use `{id}` to denote points for ids. For example, to match all endpoints starting with "/store", use "/store/*". To match endpoints with an ID "/store/123-unique-id/vendor", use "/store/{id}/vendor".
 
 #### Examples
 To match endpoints without and with an ID:
@@ -46,12 +68,12 @@ To match endpoints without and with an ID:
   "endpoints": {
     "/product": {
       "GET": { "permissions": [], "groups": [] },
-      "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+      "PUT-PATCH": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
     },
-    "/product/{id}": {
+    "/product/{id}/": {
       "GET": { "permissions": [], "groups": [] },
       "PUT": { "permissions": ["OWNER"], "groups": ["ADMINS"] },
-      "DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
+      "POST-DELETE": { "permissions": ["OWNER"], "groups": ["ADMINS"] }
     }
   }
 }
@@ -80,7 +102,7 @@ Request Parameters:
 
 - `method` (str): The HTTP method being used (e.g., "GET", "POST", "PUT", "DELETE").
 - `auth_token` (str): User's authorization token.
-- `request_path` (str): Path to the requested resource.
+- `request_path` (str): Path to the requested resource (e.g., "/store/vendor").
 
 Response:
 - result (bool, int): 
