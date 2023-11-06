@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -134,6 +135,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -141,4 +144,51 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': "Welcome to the API documentation for Fixam’s Store Service. This service is responsible for managing and providing information about stores registered on Fixam, an online market-place platform.",
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# Logs
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    print(LOG_DIR)
+    os.mkdir(LOG_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'store': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'store.log'),
+            'formatter': 'verbose',
+        },
+        'events': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'events.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'api_v1_store': {
+            'handlers': ['store'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'api_v1_events': {
+            'handlers': ['events'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
