@@ -20,10 +20,9 @@ if sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '$DEV_D
 else
   # Create the PostgreSQL database
   sudo -u postgres psql -c "CREATE DATABASE $DEV_DB_NAME;"
+  # Grant all privileges to the user on the database
+  sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DEV_DB_NAME TO $DEV_DB_USER;"
 fi
-
-# Grant all privileges to the user on the database
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DEV_DB_NAME TO $DEV_DB_USER;"
 
 
 # Install requirements.txt
