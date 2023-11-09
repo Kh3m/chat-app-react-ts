@@ -149,16 +149,27 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'auth': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'debug.log'),
+            'filename': os.path.join(LOG_DIR, 'auth.log'),
+            'formatter': 'verbose',
+        },
+        'events': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'events.log'),
             'formatter': 'verbose',
         },
     },
     'loggers': {
-        'auth_v1': {
-            'handlers': ['file'],
+        'api_v1': {
+            'handlers': ['auth'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'api_v1_events': {
+            'handlers': ['events'],
             'level': 'DEBUG',
             'propagate': True,
         },
