@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /home/ubuntu/django-aws_cicd/product_service/
+cd /home/ubuntu/django-aws_cicd/products_service/
 
 # Install any software that's unique to the service
 
