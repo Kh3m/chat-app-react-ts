@@ -14,10 +14,15 @@ DEV_DB_USER="fixam_dev"
 DEV_DB_USER_PWD="fixam_dev_pwd"
 
 # Create the PostgreSQL database
-sudo -u postgres psql -c "CREATE DATABASE $DEV_DB_NAME;"
-
-# Grant all privileges to the user on the database
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DEV_DB_NAME TO $DEV_DB_USER;"
+# Check if the database exists
+if sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '$DEV_DB_NAME'" | grep -qw 1; then
+  :
+else
+  # Create the PostgreSQL database
+  sudo -u postgres psql -c "CREATE DATABASE $DEV_DB_NAME;"
+  # Grant all privileges to the user on the database
+  sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DEV_DB_NAME TO $DEV_DB_USER;"
+fi
 
 # Install requirements.txt
 pip3 install -r requirements.txt
