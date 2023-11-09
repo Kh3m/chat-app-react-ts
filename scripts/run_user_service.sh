@@ -16,4 +16,4 @@ pip3 install -r requirements.txt
 # run server
 python3 manage.py makemigrations api_v1
 python3 manage.py migrate
-screen -d -m python3 manage.py runserver 0:8006
+screen -d -m python3 manage.py runserver 0:8005
