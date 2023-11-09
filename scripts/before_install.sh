@@ -31,9 +31,12 @@ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.12 2
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 2
 
-# Install pip for Python 3.12
+# Install pip for Python3.12
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 python3 get-pip.py
+
+# Install virtualenv for Python3.12
+sudo apt install python3.12-venv
 
 # Install PostgreSQL
 sudo apt-get install -y postgresql postgresql-contrib
