@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /home/ubuntu/django-aws_cicd/auth_service/
+cd /home/ubuntu/django-aws_cicd/cart_service/
 
 # Install any software that's unique to the service
 
