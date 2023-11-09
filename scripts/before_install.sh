@@ -21,10 +21,11 @@ pip install --user --upgrade virtualenv
 sudo apt-get install -y docker.io
 
 # Pull RabbitMQ Docker image and start it
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+sudo docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+sudo docker start rabbitmq
 
 # Install the latest Python
-sudo add-apt-repository ppa:deadsnakes/ppa
+sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt-get install python3.12
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.12 2
