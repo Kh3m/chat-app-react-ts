@@ -6,6 +6,7 @@ cd /home/ubuntu/django-aws_cicd/review_service/
 
 # activate virtual environment
 python3 -m venv venv
+sudo chown -R ubuntu:ubuntu ./venv
 source venv/bin/activate
 
 # Create the PostgreSQL database
