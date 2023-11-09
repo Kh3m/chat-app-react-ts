@@ -6,6 +6,9 @@ from drf_spectacular.openapi import AutoSchema
 import logging
 from .policy_engine import evaluate_policy
 
+# import consumers to run consumers
+from .events import consumers
+
 logger = logging.getLogger("auth_v1")
 
 
