@@ -9,10 +9,13 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
+from os import getenv
 from datetime import timedelta
 from pathlib import Path
-from decouple import Config
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
     'dj_rest_auth',
     'dj_rest_auth.registration',
 
@@ -153,12 +157,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'api_v1.User'
 
+# djangorestframework
+# https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'PAGE_SIZE': 20,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -175,17 +182,39 @@ AUTHENTICATION_BACKENDS = [
 
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = getenv('EMAIL_HOST_USER')
 
 SITE_ID = 2
 
-# Aullauth
+# django-allauth
+# https://django-allauth.readthedocs.io/
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_UNIQUE_EMAIL = True
+
+ACCOUNT_EMAIL_TEMPLATES = {
+    'confirmation': 'account/confirmation_message.txt',
+    'confirmation_subject': 'account/confirmation_subject.txt',
+}
+ACCOUNT_ADAPTER = 'api_v1.adapters.CustomAccountAdapter'
+
+
+EMAIL_CONFIRM_REDIRECT_BASE_URL = \
+    "http://localhost:3000/email/confirm/"
+
+PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = \
+    "http://localhost:3000/password-reset/confirm/"
 
 LOGIN_DIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/api/v1/"
@@ -199,7 +228,7 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,
     'JWT_AUTH_RETURN_EXPIRATION': True,
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh',
-    
+
     'USER_DETAILS_SERIALIZER': 'api_v1.serializers.CustomUserDetailsSerializer'
 }
 
@@ -215,8 +244,8 @@ SIMPLE_JWT = {
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
-            "client_id": Config('GOOGLE_AUTH_CLIENT_ID'),
-            "secret": Config('GOOGLE_AUTH_SECRET'),
+            "client_id": "901993024196-44r7mfptmsop6thoop998km07h0l2blk.apps.googleusercontent.com",
+            "secret": "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",
             "key": "",
         },
         "SCOPE": [
@@ -227,6 +256,53 @@ SOCIALACCOUNT_PROVIDERS = {
             "access_type": "online",
         },
         "VERIFIED_EMAIL": True,
+    },
+}
+
+# Logs
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    print(LOG_DIR)
+    os.mkdir(LOG_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'users': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'users.log'),
+            'formatter': 'verbose',
+        },
+        'events': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'events.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'api_v1_users': {
+            'handlers': ['users'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'api_v1_events': {
+            'handlers': ['events'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 

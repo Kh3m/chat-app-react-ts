@@ -1,3 +1,4 @@
+import logging
 from django.urls import reverse
 from rest_framework import serializers
 from django.contrib.auth.models import Group
@@ -6,11 +7,14 @@ from dj_rest_auth.serializers import UserDetailsSerializer
 from api_v1.models import User, Profile, Address
 from api_v1.utils.custom_fields import CustomHyperLinkedModelSerializer
 
+logger = logging.getLogger("api_v1")
+
 
 class GroupSerializer(CustomHyperLinkedModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
+
 
 class AddressSerializer(CustomHyperLinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
@@ -23,10 +27,11 @@ class AddressSerializer(CustomHyperLinkedModelSerializer):
         user = validated_data.get('user')
         if len(user.addresses.all()) >= 3:
             raise serializers.ValidationError("Address limit exceeded.")
-        
+
         address = Address.objects.create(**validated_data)
         user.addresses.add(address)
         return address
+
 
 class UserSerializer(CustomHyperLinkedModelSerializer):
     id = serializers.UUIDField(read_only=True)
@@ -43,7 +48,7 @@ class UserSerializer(CustomHyperLinkedModelSerializer):
         if instance.profile:
             return request.build_absolute_uri(reverse('profile-detail', kwargs={'pk': instance.profile.id}))
         return None
-    
+
     def get_groups(self, instance):
         try:
             user_groups = []
@@ -51,7 +56,7 @@ class UserSerializer(CustomHyperLinkedModelSerializer):
             [user_groups.append(group.name) for group in groups]
             return user_groups
         except Exception as e:
-            # log an error.
+            logger.error(f"Failed to get user groups: {e}")
             return []
 
 
@@ -70,8 +75,8 @@ class ProfileSerializer(CustomHyperLinkedModelSerializer):
         return None
 
 
-
 class CustomUserDetailsSerializer(UserDetailsSerializer):
+    # addresses = AddressSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -79,5 +84,6 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
             'username',
             'user_permissions',
             'is_staff',
-            'password'
+            'password',
+            'groups'
         )

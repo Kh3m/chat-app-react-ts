@@ -2,12 +2,14 @@ from api_v1.models import User, Profile, Address
 from api_v1.serializers import UserSerializer, ProfileSerializer
 from api_v1.serializers import GroupSerializer, AddressSerializer
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
+from django.http import HttpResponseRedirect
 from drf_spectacular.utils import extend_schema, OpenApiTypes
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -130,6 +132,18 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://localhost:3000/"
     client_class = OAuth2Client
+
+
+def email_confirm_redirect(request, key):
+    return HttpResponseRedirect(
+        f"{settings.EMAIL_CONFIRM_REDIRECT_BASE_URL}{key}/"
+    )
+
+
+def password_reset_confirm_redirect(request, uidb64, token):
+    return HttpResponseRedirect(
+        f"{settings.PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL}{uidb64}/{token}/"
+    )
 
 
 class Generate_user_cert(APIView):

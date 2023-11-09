@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from phonenumber_field.modelfields import PhoneNumberField
 
 from api_v1.utils.helpers import validate_iso_code
-      
+
 
 class User(AbstractUser):
     CHOICES = [(False, 'Customer'), (True, 'Vendor'),]
@@ -19,7 +19,6 @@ class User(AbstractUser):
     email = models.EmailField(max_length=320, unique=True, null=False)
     addresses = models.ManyToManyField("Address", related_name="addresses")
 
-    
     def __str__(self):
         return self.first_name
 
@@ -57,7 +56,8 @@ class Address(models.Model):
     def __repr__(self):
         obj = vars(self)
         return str(obj)
-       
+
+
 def create_groups(sender, **kwargs):
     Group.objects.get_or_create(name='admins')
     Group.objects.get_or_create(name='super_admins')
