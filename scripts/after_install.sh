@@ -14,3 +14,6 @@ else
   sudo -u postgres psql -c "CREATE USER fixam_dev WITH ENCRYPTED PASSWORD 'fixam_dev_pwd';"
   echo "User fixam_dev created."
 fi
+
+# Make ubuntu owner of every file in /home/ubuntu/django-aws_cicd
+sudo chown -R ubuntu:ubuntu /home/ubuntu/django-aws_cicd
