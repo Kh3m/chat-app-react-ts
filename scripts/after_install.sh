@@ -6,4 +6,4 @@ sudo pkill -f runserver
 # kill frontend servers too
 
 # Create the PostgreSQL user
-sudo -u postgres psql -c "CREATE USER fxm_dev WITH ENCRYPTED PASSWORD 'fxm_dev_pwd';"
+sudo -u postgres psql -c "CREATE USER fixam_dev WITH ENCRYPTED PASSWORD 'fixam_dev_pwd';"
