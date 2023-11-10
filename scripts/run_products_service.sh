@@ -33,4 +33,15 @@ sed -i "/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['$(curl -s ifconfig.me)']" ./products_
 # run server
 python3 manage.py makemigrations api_v1
 python3 manage.py migrate
-screen -d -m python3 manage.py runserver 0:8003
+screen -d -m python3 manage.py runserver 0:8003 > output.txt 2>&1
+
+# Check the exit code of the last command
+if [ $? -ne 0 ]; then
+    echo "Error: The runserver command failed."
+    # Echo the contents of the output file for additional information
+    echo "=== Output ==="
+    cat output.txt
+    exit 1  # Exit the script with a non-zero exit code to indicate failure
+fi
+
+cat output.txt
