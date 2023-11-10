@@ -8,6 +8,12 @@ cd /home/ubuntu/django-aws_cicd/review_service/
 python3 -m venv venv
 source venv/bin/activate
 
+# Set environmental variables
+export DEV_DB_NAME="review_service_dev"
+export DEV_DB_USER="fixam_dev"
+export DEV_DB_USER_PWD="fixam_dev_pwd"
+
+
 # Create the PostgreSQL database
 # Check if the database exists
 if sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '$DEV_DB_NAME'" | grep -qw 1; then
