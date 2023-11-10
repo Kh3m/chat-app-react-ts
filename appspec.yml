@@ -9,9 +9,16 @@ hooks:
   AfterInstall:
       - location: scripts/after_install.sh
       - location: scripts/run_auth_service.sh
+        runas: ubuntu
       - location: scripts/run_cart_service.sh
+        runas: ubuntu
       - location: scripts/run_order_service.sh
+        runas: ubuntu
       - location: scripts/run_products_service.sh
+        runas: ubuntu
       - location: scripts/run_review_service.sh
+        runas: ubuntu
       - location: scripts/run_store_service.sh
+        runas: ubuntu
       - location: scripts/run_user_service.sh
+        runas: ubuntu
