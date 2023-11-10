@@ -16,4 +16,4 @@ else
 fi
 
 # Make ubuntu owner of every file in /home/ubuntu/django-aws_cicd
-# sudo chown -R ubuntu:ubuntu /home/ubuntu/django-aws_cicd
+sudo chown -R ubuntu:ubuntu /home/ubuntu/django-aws_cicd
