@@ -13,7 +13,6 @@ export DEV_DB_NAME="review_service_dev"
 export DEV_DB_USER="fixam_dev"
 export DEV_DB_USER_PWD="fixam_dev_pwd"
 
-
 # Create the PostgreSQL database
 # Check if the database exists
 if sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '$DEV_DB_NAME'" | grep -qw 1; then
@@ -27,6 +26,9 @@ fi
 
 # Install requirements.txt
 pip3 install -r requirements.txt
+
+# Add instance public IP address to ALLOWED_HOST
+sed -i "/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['$(curl -s ifconfig.me)']" ./auth_service/settings.py
 
 # run server
 python3 manage.py makemigrations api_v1
