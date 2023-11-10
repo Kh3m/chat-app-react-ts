@@ -27,6 +27,9 @@ fi
 # Install requirements.txt
 pip3 install -r requirements.txt
 
+# Add instance public IP address to ALLOWED_HOST
+sed -i "/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['$(curl -s ifconfig.me)']" ./auth_service/settings.py
+
 # run server
 python3 manage.py makemigrations api_v1
 python3 manage.py migrate
