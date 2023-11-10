@@ -6,13 +6,12 @@ cd /home/ubuntu/django-aws_cicd/order_service/
 
 # activate virtual environment
 python3 -m venv venv
-sudo chown -R ubuntu:ubuntu ./venv
 source venv/bin/activate
 
 # Set environmental variables
-DEV_DB_NAME="order_service_dev"
-DEV_DB_USER="fixam_dev"
-DEV_DB_USER_PWD="fixam_dev_pwd"
+export DEV_DB_NAME="order_service_dev"
+export DEV_DB_USER="fixam_dev"
+export DEV_DB_USER_PWD="fixam_dev_pwd"
 
 # Create the PostgreSQL database
 # Check if the database exists
