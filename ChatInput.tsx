@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { MessageType } from "./ChatMessage";
 import { FieldValues, useForm } from "react-hook-form";
 

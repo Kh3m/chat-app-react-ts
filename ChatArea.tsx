@@ -5,7 +5,7 @@ import ChatMessage, { MessageType } from "./ChatMessage";
 interface Props {
   hideSideBar: boolean;
   currentUser?: string;
-  handleSendMessage?: (msg: MessageType) => void;
+  handleSendMessage: (msg: MessageType) => void;
   messages?: MessageType[];
 }
 const ChatArea = ({
@@ -17,7 +17,7 @@ const ChatArea = ({
   return (
     <div className="flex-1">
       <ChatHeader user={currentUser} />
-      <ChatMessage messages={messages} />
+      <ChatMessage currentUser={currentUser} messages={messages} />
       <ChatInput
         hideSideBar={hideSideBar}
         handleSendMessage={handleSendMessage}

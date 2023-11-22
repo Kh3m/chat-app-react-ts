@@ -3,45 +3,52 @@ import SideBar from "./SideBar";
 import { useState, useEffect } from "react";
 import UsernameField from "./UsernameField";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { MessageType } from "./ChatMessage";
 
 const Chat = () => {
   const [hideSideBar, setHideSideBar] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [conversationId, setConversationId] = useState("");
   const [messageHistory, setMessageHistory] = useState<any>([]);
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
 
   // const [username, setUsername] = useState("ws://localhost:8000/");
-  const url = "ws://localhost:8000/khem";
+  const url = "wss://fixam-chat-app.onrender.com";
 
-  const { readyState, sendJsonMessage } = useWebSocket(
-    `ws://localhost:8000/something`,
-    {
-      onOpen: () => {
-        console.log("Connected!");
-      },
-      onClose: () => {
-        console.log("Disconnected!");
-      },
-      // onMessage handler
-      onMessage: (e) => {
-        const data = JSON.parse(e.data);
-        switch (data.type) {
-          case "welcome_message":
-            setWelcomeMessage(data.message);
-            break;
-          case "chat_message_echo":
-            setMessageHistory((prev: any) => prev.concat(data));
-            break;
-          default:
-            console.log("Unknown message type!");
-            break;
-        }
-      },
-    }
-  );
+  const { readyState, sendJsonMessage } = useWebSocket(url, {
+    onOpen: () => {
+      console.log("Connected!");
+    },
+    onClose: () => {
+      console.log("Disconnected!");
+    },
+    // onMessage handler
+    onMessage: (e) => {
+      const data = JSON.parse(e.data);
+      switch (data.type) {
+        case "conversation_created":
+          // setWelcomeMessage(data.message);
+          setConversationId(data.conversation_id);
+          console.log(data);
+          break;
+        case "incoming_message":
+          // setWelcomeMessage(data.message);
+          console.log(data);
+          break;
+        case "chat_message_echo":
+          setMessageHistory((prev: any) => prev.concat(data));
+          break;
+        case "chat_message_echo":
+          setMessageHistory((prev: any) => prev.concat(data));
+          break;
+        default:
+          console.log("Unknown message type!", data);
+          break;
+      }
+    },
+  });
 
-  sendJsonMessage({ type: "any", Love: "To Code" });
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
     [ReadyState.OPEN]: "Open",
@@ -74,8 +81,27 @@ const Chat = () => {
 
   const handleUsername = (username: string) => {
     // setUsername(username);
+    sendJsonMessage({
+      type: "start_conversation",
+      data: {
+        email: "khem6333@gmail.com",
+        username,
+      },
+    });
   };
 
+  const handleSendMessage = (msg: MessageType) => {
+    sendJsonMessage({
+      ...msg,
+      conversationId,
+      fromUserEmail: "khem6333@gmail.com",
+    });
+    console.log({
+      ...msg,
+      conversationId,
+      fromUserEmail: "khem6333@gmail.com",
+    });
+  };
   useEffect(() => {}, []);
 
   return (
@@ -86,7 +112,10 @@ const Chat = () => {
           hideSideBar={hideSideBar}
           handleSideBarVisibility={handleSideBarVisibility}
         />
-        <ChatArea hideSideBar={hideSideBar} />
+        <ChatArea
+          hideSideBar={hideSideBar}
+          handleSendMessage={handleSendMessage}
+        />
       </div>
     </div>
   );

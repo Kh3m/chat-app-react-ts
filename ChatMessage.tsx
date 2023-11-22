@@ -25,12 +25,17 @@ export type MessageType = {
 
 interface Props {
   messages?: MessageType[];
+  currentUser?: string;
 }
 
-const ChatMessage = ({ messages }: Props) => {
+const ChatMessage = ({ messages, currentUser }: Props) => {
+  if (!currentUser) {
+    console.log("Noooooooo", currentUser);
+  }
   return (
     <div className="h-screen overflow-y-auto p-4 pb-36">
       {messages?.map(({ type, message, isTyping }, i) => {
+        // if (type === "custom" && currentUser) return null;
         if (type === "custom")
           return <CustomMessage key={i} message={message} />;
         if (type === "join") return <JoinMessage key={i} message={message} />;
