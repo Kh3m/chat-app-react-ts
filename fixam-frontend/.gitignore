@@ -25,3 +25,6 @@ dist-ssr
 
 # Khem
 *.pem
+socket.ts
+Chat.tsx
+chat-server
